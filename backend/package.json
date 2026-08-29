@@ -1,0 +1,23 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "backend pro",
+  "homepage": "https://github.com/jO-Ao02/mirepositorio#readme",
+  "bugs": {
+    "url": "https://github.com/jO-Ao02/mirepositorio/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jO-Ao02/mirepositorio.git"
+  },
+  "license": "ISC",
+  "author": "joao",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "pg": "^8.23.0"
+  }
+}
