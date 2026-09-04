@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Usuario — Panel de Personal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+
+<div id="barraSuperior"></div>
+
+<main class="contenido" style="max-width: 640px;">
+
+  <a href="usuarios.html" class="enlace-volver">&larr; Volver a usuarios</a>
+
+  <div class="cabecera-seccion">
+    <div>
+      <h1 id="tituloFormulario">Nuevo usuario</h1>
+      <p>Completa los datos de la cuenta del personal.</p>
+    </div>
+  </div>
+
+  <div class="tarjeta">
+    <h2>Datos de la cuenta</h2>
+    <p class="tarjeta__descripcion">Nombre, usuario de acceso y rol dentro del restaurante.</p>
+
+    <div id="mensajeFormulario" class="mensaje" hidden></div>
+
+    <form id="formularioUsuario" novalidate>
+      <div class="grid-2">
+        <div class="campo">
+          <label for="campoNombre">Nombre</label>
+          <input type="text" id="campoNombre" placeholder="Ana" required>
+        </div>
+        <div class="campo">
+          <label for="campoApellido">Apellido</label>
+          <input type="text" id="campoApellido" placeholder="Torres" required>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="campo">
+          <label for="campoNombreUsuario">Usuario</label>
+          <input type="text" id="campoNombreUsuario" class="mono" placeholder="ana.torres" required>
+        </div>
+        <div class="campo">
+          <label for="campoRol">Rol</label>
+          <select id="campoRol" required>
+            <option value="" disabled selected>Selecciona un rol</option>
+            <option value="admin">Administrador</option>
+            <option value="mesero">Mesero</option>
+            <option value="cocina">Cocina</option>
+            <option value="cajero">Cajero</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="campo" id="grupoContrasena">
+        <label for="campoContrasena">Contraseña</label>
+        <input type="password" id="campoContrasena" placeholder="Mínimo 6 caracteres">
+        <small>La persona podrá cambiarla después desde su perfil.</small>
+      </div>
+
+      <button type="submit" class="boton boton--principal" style="width:auto;">Guardar</button>
+    </form>
+  </div>
+
+  <div class="tarjeta" id="seccionEstado" hidden>
+    <h2>Estado de la cuenta</h2>
+    <p class="tarjeta__descripcion">Un usuario inactivo no puede iniciar sesión en el sistema.</p>
+    <button type="button" id="botonCambiarEstado" class="boton boton--advertencia">Desactivar usuario</button>
+  </div>
+
+  <div class="tarjeta" id="seccionCambiarContrasena" hidden>
+    <h2>Cambiar contraseña</h2>
+    <p class="tarjeta__descripcion">Esto reemplaza la contraseña actual del usuario.</p>
+
+    <div id="mensajeContrasena" class="mensaje" hidden></div>
+
+    <form id="formularioContrasena" novalidate>
+      <div class="grid-2">
+        <div class="campo">
+          <label for="campoNuevaContrasena">Nueva contraseña</label>
+          <input type="password" id="campoNuevaContrasena" placeholder="Mínimo 6 caracteres" required>
+        </div>
+        <div class="campo">
+          <label for="campoConfirmarContrasena">Confirmar contraseña</label>
+          <input type="password" id="campoConfirmarContrasena" placeholder="Repite la contraseña" required>
+        </div>
+      </div>
+
+      <button type="submit" class="boton boton--fantasma" style="width:auto;">Actualizar contraseña</button>
+    </form>
+  </div>
+
+</main>
+
+<script src="../../js/api.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../components/topbar.js"></script>
+<script src="../../js/usuarios/usuariosForm.js"></script>
+</body>
+</html>

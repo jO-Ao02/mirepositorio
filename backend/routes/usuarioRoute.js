@@ -6,7 +6,10 @@ const rutas = {
         res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
         res.end('Servidor funcionando correctamente');
     },
-    'GET /usuarios': usuarioController.obtenerUsuarios,
+    'GET /usuarios': async function(req, res) {
+        await verificarToken(req, res, usuarioController.obtenerUsuarios);
+    },
+    //desprotejida por el momento
     'POST /usuarios': usuarioController.crearUsuario,
     'POST /login': usuarioController.login,
     

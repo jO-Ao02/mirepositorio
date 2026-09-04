@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iniciar sesión — Panel de Personal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="pantalla-login">
+  <div class="tarjeta-login">
+
+    <div class="tarjeta-login__marca">
+      <span class="tarjeta-login__icono">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 3v8a3 3 0 003 3v7M4 3v8m3-8v8M7 3v8m6-8v18m0-18a4 4 0 014 4v4a2 2 0 01-2 2h-2V3z" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <p class="tarjeta-login__eyebrow">Sistema del restaurante</p>
+    </div>
+
+    <h1 class="tarjeta-login__titulo">Panel de Personal</h1>
+
+    <div id="mensajeError" class="mensaje mensaje--error" hidden></div>
+
+    <form id="formularioLogin" novalidate>
+      <div class="campo">
+        <label for="campoNombreUsuario">Usuario</label>
+        <input type="text" id="campoNombreUsuario" name="nombre_usuario" placeholder="nombre.usuario" autocomplete="username" required>
+      </div>
+
+      <div class="campo">
+        <label for="campoContrasena">Contraseña</label>
+        <input type="password" id="campoContrasena" name="contrasena" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+
+      <button type="submit" id="botonEntrar" class="boton boton--principal">Entrar</button>
+    </form>
+
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>
