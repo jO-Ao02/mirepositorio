@@ -21,6 +21,12 @@ function cerrarSesion() {
 
 
 //---
+function obtenerRutaRaiz() {
+    if (window.location.pathname.indexOf('/pages/') !== -1) {
+        return '../../';
+    }
+    return './'; 
+}
 
 function protegerPaginaAdmin() {
     var token = localStorage.getItem('token');
@@ -45,4 +51,17 @@ function formatearRol(rol) {
         return 'Cajero';
     }
     return rol;
+}
+
+function obtenerRutaSegunRol(rol) {
+    if (rol === 'admin') {
+        return 'pages/usuarios/usuarios.html';
+    }
+    if (rol === 'mesero') {
+        return 'pages/mozos/mozos.html';
+    }
+    if (rol === 'cajero') {
+        return 'pages/cajero/cajero.html';
+    }
+    return 'pages/usuarios/usuarios.html';
 }

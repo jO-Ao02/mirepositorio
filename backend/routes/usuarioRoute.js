@@ -9,8 +9,9 @@ const rutas = {
     'GET /usuarios': async function(req, res) {
         await verificarToken(req, res, usuarioController.obtenerUsuarios);
     },
-    //desprotejida por el momento
-    'POST /usuarios': usuarioController.crearUsuario,
+    'POST /usuarios': async function(req, res) {
+        await verificarToken(req, res, usuarioController.crearUsuario);
+    },
     'POST /login': usuarioController.login,
     
 };

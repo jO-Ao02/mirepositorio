@@ -10,7 +10,6 @@ async function manejarEnvioLogin(evento) {
  
     var nombreUsuario = document.getElementById('campoNombreUsuario').value.trim();
     var contrasena = document.getElementById('campoContrasena').value;
-    var mensajeError = document.getElementById('mensajeError');
     var botonEntrar = document.getElementById('botonEntrar');
  
     ocultarMensajeError();
@@ -40,7 +39,8 @@ async function manejarEnvioLogin(evento) {
         }
  
         guardarSesion(datos.token, datos.usuario);
-        window.location.href = 'pages/usuarios.html';
+        var destino = obtenerRutaSegunRol(datos.usuario.rol);
+        window.location.href = destino;
  
     } catch (error) {
         mostrarMensajeError(error.message);
@@ -60,3 +60,4 @@ function ocultarMensajeError() {
     mensajeError.textContent = '';
     mensajeError.hidden = true;
 }
+

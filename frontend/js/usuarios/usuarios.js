@@ -56,7 +56,7 @@ function crearFilaUsuario(usuario) {
         '<td><span class="etiqueta-rol etiqueta-rol--' + usuario.rol + '">' + formatearRol(usuario.rol) + '</span></td>' +
         '<td><span class="etiqueta-estado ' + claseEstado + '">' + textoEstado + '</span></td>' +
         '<td class="celda-acciones">' +
-            '<a href="usuario-form.html?id=' + usuario.id_usuario + '" class="boton boton--fantasma boton--pequeno">Editar</a>' +
+            '<a href="usuariosForm.html?id=' + usuario.id_usuario + '" class="boton boton--fantasma boton--pequeno">Editar</a>' +
             '<button type="button" class="boton ' + claseBotonEstado + ' boton--pequeno" ' +
                 'data-accion="cambiar-estado" data-id="' + usuario.id_usuario + '" data-estado="' + usuario.estado + '">' +
                 textoBotonEstado +
