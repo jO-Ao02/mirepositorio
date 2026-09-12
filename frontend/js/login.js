@@ -31,13 +31,6 @@ async function manejarEnvioLogin(evento) {
             })
         });
  
-        if (datos.usuario.rol !== 'admin') {
-            mostrarMensajeError('Este panel es solo para administradores.');
-            botonEntrar.disabled = false;
-            botonEntrar.textContent = 'Entrar';
-            return;
-        }
- 
         guardarSesion(datos.token, datos.usuario);
         var destino = obtenerRutaSegunRol(datos.usuario.rol);
         window.location.href = destino;
