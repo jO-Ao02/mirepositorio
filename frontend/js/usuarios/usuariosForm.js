@@ -59,8 +59,6 @@ function actualizarBotonEstado(estadoActual) {
     boton.className = estadoActual ? 'boton boton--advertencia' : 'boton boton--exito';
 }
  
-/* ---------------------- guardar datos generales ---------------------- */
- 
 async function manejarEnvioFormulario(evento) {
     evento.preventDefault();
  
@@ -119,8 +117,6 @@ function mostrarMensajeFormulario(texto, tipo) {
     mensaje.hidden = false;
 }
  
-/* ---------------------- activar / desactivar ---------------------- */
- 
 async function manejarClicCambiarEstado() {
     var boton = document.getElementById('botonCambiarEstado');
     var estadoActual = boton.getAttribute('data-estado') === 'true';
@@ -148,8 +144,6 @@ async function manejarClicCambiarEstado() {
         mostrarMensajeFormulario('No se pudo cambiar el estado: ' + error.message, 'error');
     }
 }
- 
-/* ---------------------- cambiar contraseña ---------------------- */
  
 async function manejarCambioContrasena(evento) {
     evento.preventDefault();

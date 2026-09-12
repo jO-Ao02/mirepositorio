@@ -187,7 +187,7 @@ async function login(req, res) {
                 rol: usuario.rol
             };
             
-            const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '8h' });
+            const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: process.env.JWT_EXPIRES });
 
             res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
             res.end(JSON.stringify({
