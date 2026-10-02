@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salón y Comandas — Panel de Personal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+
+<div id="barraSuperior"></div>
+
+<main class="contenido">
+
+  <div class="cabecera-seccion">
+    <div>
+      <h1>Salón y Comandas</h1>
+      <p>Control de mesas, atención a clientes y toma de pedidos.</p>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <a href="pedidoForm.html?tipo=llevar" class="boton boton--principal" style="width: auto;">+ Pedido Para Llevar</a>
+    </div>
+  </div>
+
+  <!-- FILTROS Y RESUMEN DE SALÓN -->
+  <div class="cabecera-seccion" style="margin-top: 10px; margin-bottom: 16px;">
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="filtrosMesas">
+      <button type="button" class="pildora pildora--activa" data-filtro="todas">Todas las mesas</button>
+      <button type="button" class="pildora" data-filtro="Libre">Libres</button>
+      <button type="button" class="pildora" data-filtro="Ocupada">Ocupadas</button>
+    </div>
+    <button type="button" id="botonActualizarMesas" class="boton boton--fantasma boton--pequeno">&#x21bb; Actualizar salón</button>
+  </div>
+
+  <!-- CUADRÍCULA DE MESAS -->
+  <div id="contenedorMesas" class="cuadricula-mesas">
+    <div class="mensaje-vacio" style="grid-column: 1 / -1;">Cargando mesas del salón...</div>
+  </div>
+
+  <!-- COMANDAS ACTIVAS -->
+  <div class="cabecera-seccion" style="margin-top: 36px;">
+    <div>
+      <h2 style="margin: 0 0 4px; font-size: 18px;">Comandas en atención</h2>
+      <p>Pedidos enviados a cocina y pendientes de cobro en caja.</p>
+    </div>
+  </div>
+
+  <div class="tabla-envoltorio">
+    <table>
+      <thead>
+        <tr>
+          <th>Mesa / Pedido</th>
+          <th>Tipo</th>
+          <th>Hora</th>
+          <th>Estado Cocina</th>
+          <th>Total comanda</th>
+          <th style="text-align: right;">Acción</th>
+        </tr>
+      </thead>
+      <tbody id="cuerpoTablaComandas"></tbody>
+    </table>
+    <div id="mensajeSinComandas" class="mensaje-vacio">No hay comandas activas en este momento.</div>
+  </div>
+
+</main>
+
+<script src="../../js/api.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../components/topBar.js"></script>
+<script src="../../js/mozos/mozos.js"></script>
+</body>
+</html>

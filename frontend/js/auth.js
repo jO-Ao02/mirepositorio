@@ -36,6 +36,24 @@ function protegerPaginaAdmin() {
         window.location.href = obtenerRutaRaiz() + 'index.html';
     }
 }
+
+function protegerPaginaCajero() {
+    var token = localStorage.getItem('token');
+    var usuario = obtenerUsuarioSesion();
+ 
+    if (!token || !usuario || (usuario.rol !== 'cajero' && usuario.rol !== 'admin')) {
+        window.location.href = obtenerRutaRaiz() + 'index.html';
+    }
+}
+
+function protegerPaginaMozo() {
+    var token = localStorage.getItem('token');
+    var usuario = obtenerUsuarioSesion();
+ 
+    if (!token || !usuario || (usuario.rol !== 'mesero' && usuario.rol !== 'admin')) {
+        window.location.href = obtenerRutaRaiz() + 'index.html';
+    }
+}
  
 function formatearRol(rol) {
     if (rol === 'admin') {

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cobrar Pedido — Panel de Personal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+
+<div id="barraSuperior"></div>
+
+<main class="contenido" style="max-width: 760px;">
+
+  <a href="cajero.html" class="enlace-volver">&larr; Volver a caja</a>
+
+  <div class="cabecera-seccion">
+    <div>
+      <h1 id="tituloCobro">Cobrar Pedido</h1>
+      <p id="subtituloCobro">Verifica el consumo de la mesa, datos del cliente y confirma el pago.</p>
+    </div>
+  </div>
+
+  <div id="mensajeCobro" class="mensaje" hidden></div>
+
+  <form id="formularioCobro" novalidate>
+
+    <!-- TARJETA 1: DETALLE DEL PEDIDO -->
+    <div class="tarjeta">
+      <h2>1. Detalle del pedido</h2>
+      <p class="tarjeta__descripcion">Consumo registrado por el personal de salón.</p>
+
+      <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; padding:10px 14px; background:var(--surface-sunk); border-radius:var(--radius-sm); margin-bottom:14px; font-size:13px;">
+        <div><strong>Mesa:</strong> <span id="infoMesa">-</span></div>
+        <div><strong>Tipo:</strong> <span id="infoTipoPedido">-</span></div>
+        <div><strong>Atendido por:</strong> <span id="infoMozo">-</span></div>
+        <div><strong>Hora:</strong> <span id="infoHora" class="mono">-</span></div>
+      </div>
+
+      <div class="tabla-envoltorio">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 50px;">Cant.</th>
+              <th>Producto</th>
+              <th style="text-align: right; width: 100px;">P. Unit.</th>
+              <th style="text-align: right; width: 110px;">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpoDetallePedido">
+            <!-- Productos del pedido -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cuadro-totales">
+        <div class="cuadro-totales__fila">
+          <span>Op. Gravada / Subtotal:</span>
+          <span class="mono" id="textoSubtotal">S/ 0.00</span>
+        </div>
+        <div class="cuadro-totales__fila">
+          <span>IGV (18%):</span>
+          <span class="mono" id="textoIgv">S/ 0.00</span>
+        </div>
+        <div class="cuadro-totales__fila cuadro-totales__fila--total">
+          <span>Total a pagar:</span>
+          <span class="mono" id="textoTotal">S/ 0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TARJETA 2: DATOS DEL COMPROBANTE Y CLIENTE -->
+    <div class="tarjeta">
+      <h2>2. Comprobante y Cliente</h2>
+      <p class="tarjeta__descripcion">Tipo de comprobante y documento para SUNAT.</p>
+
+      <div class="grid-2">
+        <div class="campo">
+          <label for="campoTipoComprobante">Tipo de Comprobante</label>
+          <select id="campoTipoComprobante" required>
+            <option value="boleta" selected>Boleta de Venta (03)</option>
+            <option value="factura">Factura Electrónica (01)</option>
+            <option value="ticket">Nota de Venta / Ticket</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="campoTipoDocumento">Tipo de Documento</label>
+          <select id="campoTipoDocumento" required>
+            <option value="1" selected>DNI (1)</option>
+            <option value="6">RUC (6)</option>
+            <option value="4">Carnet de Extranjería (4)</option>
+            <option value="0">Sin Documento / Clientes Varios</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="campo">
+          <label for="campoNumeroDocumento">Número de Documento</label>
+          <input type="text" id="campoNumeroDocumento" class="mono" placeholder="Ej. 74859632" required>
+        </div>
+        <div class="campo">
+          <label for="campoNombreCliente">Nombre o Razón Social</label>
+          <input type="text" id="campoNombreCliente" placeholder="Ej. Juan Pérez / Empresa SAC" required>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="campo">
+          <label for="campoDireccion">Dirección</label>
+          <input type="text" id="campoDireccion" placeholder="Dirección fiscal (requerida para Factura)">
+        </div>
+        <div class="campo">
+          <label for="campoCorreo">Correo Electrónico (Opcional)</label>
+          <input type="email" id="campoCorreo" placeholder="cliente@correo.com">
+        </div>
+      </div>
+    </div>
+
+    <!-- TARJETA 3: FORMA DE PAGO -->
+    <div class="tarjeta">
+      <h2>3. Registro de Pago</h2>
+      <p class="tarjeta__descripcion">Indica cómo realiza el pago el cliente.</p>
+
+      <div class="grid-2">
+        <div class="campo">
+          <label for="campoMetodoPago">Método de Pago</label>
+          <select id="campoMetodoPago" required>
+            <option value="efectivo" selected>Efectivo</option>
+            <option value="tarjeta">Tarjeta (POS Débito / Crédito)</option>
+            <option value="yape">Yape</option>
+            <option value="plin">Plin</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="campoMontoTotalPagar">Monto a Cobrar</label>
+          <input type="text" id="campoMontoTotalPagar" class="mono" readonly value="S/ 0.00" style="font-weight:700; background:var(--surface);">
+        </div>
+      </div>
+
+      <div id="seccionEfectivo" class="grid-2">
+        <div class="campo">
+          <label for="campoMontoRecibido">Monto Recibido en Efectivo</label>
+          <input type="number" id="campoMontoRecibido" class="mono" step="0.10" min="0" placeholder="0.00">
+        </div>
+        <div class="campo">
+          <label for="campoVuelto">Vuelto / Cambio a entregar</label>
+          <input type="text" id="campoVuelto" class="mono" readonly value="S/ 0.00" style="font-weight:700; color:var(--green); background:var(--surface);">
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" id="botonConfirmarCobro" class="boton boton--exito" style="width: 100%; font-size: 15px; padding: 13px;">
+      Confirmar Cobro y Emitir Comprobante
+    </button>
+
+  </form>
+
+</main>
+
+<script src="../../js/api.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../components/topBar.js"></script>
+<script src="../../js/cajero/cobroForm.js"></script>
+</body>
+</html>

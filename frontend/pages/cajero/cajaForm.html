@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turno de Caja — Panel de Personal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+
+<div id="barraSuperior"></div>
+
+<main class="contenido" style="max-width: 640px;">
+
+  <a href="cajero.html" class="enlace-volver">&larr; Volver a caja</a>
+
+  <div class="cabecera-seccion">
+    <div>
+      <h1 id="tituloCajaForm">Control de Turno de Caja</h1>
+      <p id="subtituloCajaForm">Apertura con fondo inicial o cierre de jornada con arqueo de efectivo.</p>
+    </div>
+  </div>
+
+  <div id="mensajeCajaForm" class="mensaje" hidden></div>
+
+  <!-- SECCIÓN: APERTURA DE CAJA -->
+  <div class="tarjeta" id="seccionApertura">
+    <h2>Apertura de Turno</h2>
+    <p class="tarjeta__descripcion">Registra el saldo inicial en efectivo para comenzar a operar la caja.</p>
+
+    <form id="formularioApertura" novalidate>
+      <div class="grid-2">
+        <div class="campo">
+          <label for="campoCajeroApertura">Cajero Responsable</label>
+          <input type="text" id="campoCajeroApertura" readonly style="background:var(--surface);">
+        </div>
+        <div class="campo">
+          <label for="campoFechaApertura">Fecha y Hora</label>
+          <input type="text" id="campoFechaApertura" class="mono" readonly style="background:var(--surface);">
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="campoMontoApertura">Monto Inicial de Apertura (S/)</label>
+        <input type="number" id="campoMontoApertura" class="mono" step="0.50" min="0" placeholder="Ej. 100.00" required>
+        <small>Fondo en caja chica disponible para dar vuelto.</small>
+      </div>
+
+      <button type="submit" class="boton boton--principal" style="width: auto;">
+        Abrir Turno de Caja
+      </button>
+    </form>
+  </div>
+
+  <!-- SECCIÓN: CIERRE DE CAJA -->
+  <div class="tarjeta tarjeta--roja" id="seccionCierre" hidden>
+    <h2>Cierre de Turno y Arqueo</h2>
+    <p class="tarjeta__descripcion">Verifica el total de ventas y cuadra el efectivo real en caja antes de cerrar.</p>
+
+    <div class="cuadro-totales" style="margin-bottom: 20px;">
+      <div class="cuadro-totales__fila">
+        <span>Fondo de apertura:</span>
+        <span class="mono" id="cierreMontoApertura">S/ 0.00</span>
+      </div>
+      <div class="cuadro-totales__fila">
+        <span>Ventas en efectivo:</span>
+        <span class="mono" id="cierreVentasEfectivo">S/ 0.00</span>
+      </div>
+      <div class="cuadro-totales__fila">
+        <span>Ventas electrónicas (tarjeta/yape/plin):</span>
+        <span class="mono" id="cierreVentasDigitales">S/ 0.00</span>
+      </div>
+      <div class="cuadro-totales__fila">
+        <span>Total ventas del turno:</span>
+        <span class="mono" id="cierreTotalVentas">S/ 0.00</span>
+      </div>
+      <div class="cuadro-totales__fila cuadro-totales__fila--total">
+        <span>Efectivo esperado en caja:</span>
+        <span class="mono" id="cierreEfectivoEsperado">S/ 0.00</span>
+      </div>
+    </div>
+
+    <form id="formularioCierre" novalidate>
+      <div class="campo">
+        <label for="campoMontoCierre">Monto Real de Efectivo Contado (S/)</label>
+        <input type="number" id="campoMontoCierre" class="mono" step="0.10" min="0" placeholder="0.00" required>
+        <small>Cuenta el dinero físico que hay actualmente en la gaveta.</small>
+      </div>
+
+      <div id="contenedorDiferencia" style="padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: 16px; background: var(--surface-sunk); border: 1px solid var(--line); font-size: 13.5px; font-weight: 700;">
+        Diferencia de arqueo: <span id="textoDiferencia" class="mono">S/ 0.00</span>
+      </div>
+
+      <button type="submit" id="botonConfirmarCierre" class="boton boton--advertencia" style="width: auto;">
+        Confirmar Cierre de Turno
+      </button>
+    </form>
+  </div>
+
+</main>
+
+<script src="../../js/api.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../components/topBar.js"></script>
+<script src="../../js/cajero/cajaForm.js"></script>
+</body>
+</html>

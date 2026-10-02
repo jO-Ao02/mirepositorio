@@ -1,5 +1,7 @@
 const http = require('http');
-const manejarRutas = require('./routes/usuarioRoute');
+const manejarRutasUsuario = require('./routes/usuarioRoute');
+const manejarRutasCaja = require('./routes/cajaRoute');
+const manejarRutasMozo = require('./routes/mozoRoute');
 
 async function rutaObtenida(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*'); 
@@ -10,7 +12,20 @@ async function rutaObtenida(req, res) {
         res.writeHead(200);
         return res.end(); 
     }
-    await manejarRutas(req, res);
+
+    if (req.url.startsWith('/mesas') || req.url.startsWith('/productos')) {
+        await manejarRutasMozo(req, res);
+    } else if (req.url.startsWith('/caja') || req.url.startsWith('/pagos') || req.url.startsWith('/comprobantes')) {
+        await manejarRutasCaja(req, res);
+    } else if (req.url.startsWith('/pedidos')) {
+        if (req.method === 'POST' || req.url === '/pedidos/activos') {
+            await manejarRutasMozo(req, res);
+        } else {
+            await manejarRutasCaja(req, res);
+        }
+    } else {
+        await manejarRutasUsuario(req, res);
+    }
 }
 
 const servidor = http.createServer(rutaObtenida);

@@ -476,6 +476,299 @@ tbody tr:hover {
   color: var(--ink);
 }
 
+/* ===================== VISTAS DE CAJERO ===================== */
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 768px) {
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tarjeta--verde {
+  border-left-color: var(--green);
+}
+
+.tarjeta--roja {
+  border-left-color: var(--red);
+}
+
+.metricas-caja {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.tarjeta-metrica {
+  background: var(--surface-sunk);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+}
+
+.tarjeta-metrica__titulo {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.tarjeta-metrica__valor {
+  font-size: 20px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--ink);
+}
+
+.cuadro-totales {
+  background: var(--surface-sunk);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.cuadro-totales__fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13.5px;
+}
+
+.cuadro-totales__fila:last-child {
+  margin-bottom: 0;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.cuadro-totales__fila--total {
+  color: var(--accent-dark);
+}
+
+.etiqueta-comprobante {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--surface-sunk);
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.etiqueta-metodo {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.etiqueta-metodo--efectivo { background: var(--green-tint); color: #2C4B37; border-color: #C4D9CB; }
+.etiqueta-metodo--tarjeta  { background: #E1EAF3; color: #2C4E75; border-color: #C3D5E4; }
+.etiqueta-metodo--yape     { background: #EFE1F3; color: #6A3B7A; border-color: #DCC3E4; }
+.etiqueta-metodo--plin     { background: #E0F2FE; color: #0369A1; border-color: #BAE6FD; }
+
+/* ===================== VISTAS DE MOZOS / SALÓN ===================== */
+
+.cuadricula-mesas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.tarjeta-mesa {
+  background: var(--surface);
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.1s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.tarjeta-mesa:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.tarjeta-mesa--libre {
+  border-color: #C4D9CB;
+  background: #FAFCFA;
+}
+
+.tarjeta-mesa--libre:hover {
+  border-color: var(--green);
+}
+
+.tarjeta-mesa--ocupada {
+  border-color: #E9CDA3;
+  background: #FFFDF9;
+}
+
+.tarjeta-mesa--ocupada:hover {
+  border-color: var(--accent);
+}
+
+.tarjeta-mesa__icono {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.tarjeta-mesa__numero {
+  font-size: 24px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--ink);
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.tarjeta-mesa__capacidad {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.comanda-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .comanda-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pildoras-categoria {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+}
+
+.pildora {
+  background: var(--surface-sunk);
+  border: 1px solid var(--line);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  color: var(--ink-soft);
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.pildora:hover {
+  background: var(--surface);
+  border-color: var(--accent);
+}
+
+.pildora--activa {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+
+.cuadricula-productos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.tarjeta-producto {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tarjeta-producto:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.tarjeta-producto__nombre {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.tarjeta-producto__precio {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent-dark);
+  font-size: 14px;
+}
+
+.item-canasta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 13px;
+}
+
+.item-canasta:last-child {
+  border-bottom: none;
+}
+
+.control-cantidad {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.boton-cantidad {
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  background: var(--surface-sunk);
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.boton-cantidad:hover {
+  background: var(--surface);
+  border-color: var(--accent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nueva Comanda — Panel de Personal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+
+<div id="barraSuperior"></div>
+
+<main class="contenido" style="max-width: 1040px;">
+
+  <a href="mozos.html" class="enlace-volver">&larr; Volver a mesas</a>
+
+  <div class="cabecera-seccion">
+    <div>
+      <h1 id="tituloPedidoForm">Nueva Comanda</h1>
+      <p id="subtituloPedidoForm">Selecciona los platos y bebidas para registrar el pedido de la mesa.</p>
+    </div>
+  </div>
+
+  <div id="mensajePedido" class="mensaje" hidden></div>
+
+  <div class="comanda-layout">
+
+    <!-- COLUMNA IZQUIERDA: CONFIGURACIÓN Y CATÁLOGO DE PLATOS -->
+    <div>
+      <div class="tarjeta" style="margin-bottom: 16px;">
+        <h2>Ubicación del pedido</h2>
+        <div class="grid-2">
+          <div class="campo">
+            <label for="campoMesa">Mesa asignada</label>
+            <select id="campoMesa" required>
+              <option value="" disabled selected>Cargando mesas...</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="campoTipoPedido">Tipo de atención</label>
+            <select id="campoTipoPedido" required>
+              <option value="Mesa" selected>Consumo en Salón</option>
+              <option value="Para llevar">Para Llevar</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="tarjeta">
+        <h2>Carta del Restaurante</h2>
+        <p class="tarjeta__descripcion">Haz clic en los platos o bebidas para agregarlos a la comanda.</p>
+
+        <!-- Píldoras de Categorías -->
+        <div id="contenedorCategorias" class="pildoras-categoria">
+          <button type="button" class="pildora pildora--activa" data-categoria="todas">Todos</button>
+        </div>
+
+        <!-- Cuadrícula de Platos -->
+        <div id="contenedorProductos" class="cuadricula-productos">
+          <div class="mensaje-vacio" style="grid-column: 1 / -1;">Cargando platos de la carta...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA: RESUMEN DEL PEDIDO (CANASTA / TICKET) -->
+    <div>
+      <div class="tarjeta" style="position: sticky; top: 20px;">
+        <h2>Resumen de comanda</h2>
+        <div id="ticketInfoMesa" style="font-size: 13px; color: var(--muted); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px dashed var(--line);">
+          Destino: <strong id="textoDestinoMesa" style="color:var(--ink);">Mesa -</strong>
+        </div>
+
+        <!-- Lista de platos agregados -->
+        <div id="listaItemsCanasta" style="max-height: 380px; overflow-y: auto; padding-right: 4px;">
+          <div class="mensaje-vacio" style="padding: 24px 0;">No has agregado platos a la comanda aún.</div>
+        </div>
+
+        <!-- Cuadro de total -->
+        <div class="cuadro-totales">
+          <div class="cuadro-totales__fila">
+            <span>Ítems totales:</span>
+            <span class="mono" id="textoCantidadItems">0</span>
+          </div>
+          <div class="cuadro-totales__fila cuadro-totales__fila--total">
+            <span>Total a pagar:</span>
+            <span class="mono" id="textoTotalComanda">S/ 0.00</span>
+          </div>
+        </div>
+
+        <button type="button" id="botonEnviarComanda" class="boton boton--principal" style="width: 100%; font-size: 14.5px; padding: 12px; margin-top: 14px;">
+          Enviar Comanda a Cocina y Caja
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<script src="../../js/api.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../components/topBar.js"></script>
+<script src="../../js/mozos/pedidoForm.js"></script>
+</body>
+</html>
