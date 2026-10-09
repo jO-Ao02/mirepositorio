@@ -19,6 +19,7 @@ async function obtenerPendientesDeCobro() {
             WHERE NOT EXISTS (
                 SELECT 1 FROM pago pg WHERE pg.id_pedido = p.id_pedido
             )
+            AND COALESCE(p.estado_cocina, 'Pendiente') != 'Cancelado'
             ORDER BY p.fecha_hora ASC
         `;
         const resultado = await pool.query(consulta);
@@ -155,12 +156,24 @@ async function obtenerPedidosActivos() {
             WHERE NOT EXISTS (
                 SELECT 1 FROM pago pg WHERE pg.id_pedido = p.id_pedido
             )
+            AND COALESCE(p.estado_cocina, 'Pendiente') != 'Cancelado'
             ORDER BY p.fecha_hora DESC
         `;
         const resultado = await pool.query(consulta);
         return resultado.rows;
     } catch (error) {
         console.error('Error al obtener pedidos activos:', error.message);
+        throw error;
+    }
+}
+
+async function cambiarEstadoPedido(id_pedido, nuevo_estado) {
+    try {
+        const consulta = 'UPDATE pedido SET estado_cocina = $1 WHERE id_pedido = $2 RETURNING *';
+        const resultado = await pool.query(consulta, [nuevo_estado, id_pedido]);
+        return resultado.rows[0];
+    } catch (error) {
+        console.error('Error al cambiar estado del pedido:', error.message);
         throw error;
     }
 }
@@ -186,5 +199,6 @@ module.exports = {
     insertarDetalle,
     actualizarTotalPedido,
     limpiarDetallesPedido,
-    obtenerPedidosActivos
+    obtenerPedidosActivos,
+    cambiarEstadoPedido
 };

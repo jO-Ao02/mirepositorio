@@ -233,6 +233,59 @@ async function obtenerComprobantesPorCaja(id_caja) {
     }
 }
 
+async function registrarEgreso(id_caja, monto, descripcion) {
+    try {
+        const consulta = `
+            INSERT INTO movimiento_caja (id_caja, tipo_movimiento, monto, descripcion, fecha_movimiento)
+            VALUES ($1, 'egreso', $2, $3, NOW())
+            RETURNING *
+        `;
+        const valores = [id_caja, monto, descripcion];
+        const resultado = await pool.query(consulta, valores);
+        return resultado.rows[0];
+    } catch (error) {
+        console.error('Error al registrar egreso de caja:', error.message);
+        throw error;
+    }
+}
+
+async function obtenerEgresosPorCaja(id_caja) {
+    try {
+        const consulta = `
+            SELECT COALESCE(SUM(monto), 0) AS total_egresos
+            FROM movimiento_caja
+            WHERE id_caja = $1 AND LOWER(tipo_movimiento) = 'egreso'
+        `;
+        const resultado = await pool.query(consulta, [id_caja]);
+        return resultado.rows[0];
+    } catch (error) {
+        console.error('Error al obtener egresos de caja:', error.message);
+        throw error;
+    }
+}
+
+async function obtenerMovimientosPorCaja(id_caja) {
+    try {
+        const consulta = `
+            SELECT 
+                id_movimiento,
+                id_caja,
+                tipo_movimiento,
+                monto,
+                descripcion,
+                fecha_movimiento
+            FROM movimiento_caja
+            WHERE id_caja = $1
+            ORDER BY fecha_movimiento DESC
+        `;
+        const resultado = await pool.query(consulta, [id_caja]);
+        return resultado.rows;
+    } catch (error) {
+        console.error('Error al obtener movimientos de caja:', error.message);
+        throw error;
+    }
+}
+
 module.exports = {
     obtenerCajaAbierta,
     obtenerUltimaCaja,
@@ -245,5 +298,8 @@ module.exports = {
     obtenerTipoComprobante,
     obtenerSiguienteCorrelativo,
     insertarComprobante,
-    obtenerComprobantesPorCaja
+    obtenerComprobantesPorCaja,
+    registrarEgreso,
+    obtenerEgresosPorCaja,
+    obtenerMovimientosPorCaja
 };

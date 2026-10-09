@@ -14,6 +14,14 @@ async function obtenerEstadoActual(req, res) {
         }
 
         const ventas = await cajaModel.obtenerVentasPorCaja(cajaAbierta.id_caja);
+        const egresos = await cajaModel.obtenerEgresosPorCaja(cajaAbierta.id_caja);
+
+        const montoApertura = parseFloat(cajaAbierta.monto_apertura || 0);
+        const ventasEfectivo = parseFloat(ventas.ventas_efectivo || 0);
+        const ventasDigitales = parseFloat(ventas.ventas_digitales || 0);
+        const totalVentas = parseFloat(ventas.total_ventas || 0);
+        const totalEgresos = parseFloat(egresos.total_egresos || 0);
+        const efectivoEnCaja = parseFloat((montoApertura + ventasEfectivo - totalEgresos).toFixed(2));
 
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify({
@@ -22,10 +30,12 @@ async function obtenerEstadoActual(req, res) {
             id_usuario: cajaAbierta.id_usuario,
             nombre_usuario: cajaAbierta.nombre_usuario + ' ' + (cajaAbierta.apellido_usuario || ''),
             fecha_hora_apertura: cajaAbierta.fecha_hora_apertura,
-            monto_apertura: parseFloat(cajaAbierta.monto_apertura || 0),
-            ventas_efectivo: parseFloat(ventas.ventas_efectivo || 0),
-            ventas_digitales: parseFloat(ventas.ventas_digitales || 0),
-            total_ventas: parseFloat(ventas.total_ventas || 0)
+            monto_apertura: montoApertura,
+            ventas_efectivo: ventasEfectivo,
+            ventas_digitales: ventasDigitales,
+            total_ventas: totalVentas,
+            total_egresos: totalEgresos,
+            efectivo_en_caja: efectivoEnCaja
         }));
 
     } catch (error) {
@@ -90,9 +100,11 @@ async function cierreCaja(req, res) {
             }
 
             const ventas = await cajaModel.obtenerVentasPorCaja(cajaAbierta.id_caja);
+            const egresos = await cajaModel.obtenerEgresosPorCaja(cajaAbierta.id_caja);
             const montoApertura = parseFloat(cajaAbierta.monto_apertura || 0);
             const ventasEfectivo = parseFloat(ventas.ventas_efectivo || 0);
-            const montoEsperado = montoApertura + ventasEfectivo;
+            const totalEgresos = parseFloat(egresos.total_egresos || 0);
+            const montoEsperado = parseFloat((montoApertura + ventasEfectivo - totalEgresos).toFixed(2));
             const montoReal = parseFloat(datos.monto_cierre || 0);
 
             const cajaCerrada = await cajaModel.cerrarCaja(cajaAbierta.id_caja, montoEsperado, montoReal);
@@ -228,10 +240,76 @@ async function obtenerComprobantesTurno(req, res) {
     }
 }
 
+async function registrarEgreso(req, res) {
+    let body = '';
+    req.on('data', function (chunk) { body += chunk.toString(); });
+
+    req.on('end', async function () {
+        try {
+            const datos = JSON.parse(body);
+
+            const cajaAbierta = await cajaModel.obtenerCajaAbierta();
+            if (!cajaAbierta) {
+                res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                return res.end(JSON.stringify({ mensaje: 'No hay ninguna caja abierta. Debe abrir turno de caja para registrar egresos.' }));
+            }
+
+            const monto = parseFloat(datos.monto || 0);
+            const descripcion = (datos.descripcion || '').trim();
+
+            if (isNaN(monto) || monto <= 0) {
+                res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                return res.end(JSON.stringify({ mensaje: 'El monto del egreso debe ser mayor a 0' }));
+            }
+
+            if (!descripcion) {
+                res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                return res.end(JSON.stringify({ mensaje: 'Debes ingresar el motivo o descripción del egreso (ej. Taxi, Imprevisto, Insumos)' }));
+            }
+
+            const nuevoEgreso = await cajaModel.registrarEgreso(cajaAbierta.id_caja, monto, descripcion);
+
+            res.writeHead(201, { 'Content-Type': 'application/json; charset=utf-8' });
+            res.end(JSON.stringify({
+                mensaje: 'Egreso registrado exitosamente',
+                egreso: nuevoEgreso
+            }));
+
+        } catch (error) {
+            console.error('Error al registrar egreso:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+            res.end(JSON.stringify({ mensaje: 'Error al registrar el egreso: ' + error.message }));
+        }
+    });
+}
+
+async function obtenerMovimientos(req, res) {
+    try {
+        const cajaAbierta = await cajaModel.obtenerCajaAbierta();
+
+        if (!cajaAbierta) {
+            res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+            return res.end(JSON.stringify([]));
+        }
+
+        const movimientos = await cajaModel.obtenerMovimientosPorCaja(cajaAbierta.id_caja);
+
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify(movimientos));
+
+    } catch (error) {
+        console.error('Error al obtener movimientos:', error);
+        res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ mensaje: 'Error al obtener los movimientos de caja' }));
+    }
+}
+
 module.exports = {
     obtenerEstadoActual,
     aperturaCaja,
     cierreCaja,
     procesarCobro,
-    obtenerComprobantesTurno
+    obtenerComprobantesTurno,
+    registrarEgreso,
+    obtenerMovimientos
 };

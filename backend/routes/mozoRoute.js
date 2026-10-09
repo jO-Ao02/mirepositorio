@@ -15,6 +15,9 @@ const rutas = {
     },
     'GET /pedidos/activos': async function(req, res) {
         await verificarToken(req, res, pedidoController.obtenerPedidosActivos);
+    },
+    'POST /pedidos/cambiar-estado': async function(req, res) {
+        await verificarToken(req, res, pedidoController.cambiarEstadoPedido);
     }
 };
 

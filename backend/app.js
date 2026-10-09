@@ -18,7 +18,7 @@ async function rutaObtenida(req, res) {
     } else if (req.url.startsWith('/caja') || req.url.startsWith('/pagos') || req.url.startsWith('/comprobantes')) {
         await manejarRutasCaja(req, res);
     } else if (req.url.startsWith('/pedidos')) {
-        if (req.method === 'POST' || req.url === '/pedidos/activos') {
+        if (req.method === 'POST' || req.url === '/pedidos/activos' || req.url.startsWith('/pedidos/cambiar-estado')) {
             await manejarRutasMozo(req, res);
         } else {
             await manejarRutasCaja(req, res);

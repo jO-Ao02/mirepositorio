@@ -123,6 +123,21 @@ function crearFilaComanda(pedido) {
     var nombreMesa = pedido.numero_mesa ? 'Mesa ' + pedido.numero_mesa : 'Para llevar';
     var hora = pedido.fecha_hora ? new Date(pedido.fecha_hora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
 
+    var estadoCocina = pedido.estado_cocina || 'Pendiente';
+    var esTerminado = estadoCocina === 'Terminado' || estadoCocina === 'Listo';
+
+    var etiquetaEstado = '';
+    if (esTerminado) {
+        etiquetaEstado = '<span class="etiqueta-estado etiqueta-estado--activo">Listo para cobrar</span>';
+    } else {
+        etiquetaEstado = '<span class="etiqueta-estado etiqueta-rol--cocina">En preparación</span>';
+    }
+
+    var botonEstado = '';
+    if (!esTerminado) {
+        botonEstado = '<button type="button" class="boton boton--exito boton--pequeno boton-marcar-listo" data-id="' + pedido.id_pedido + '">✓ Marcar Listo</button>';
+    }
+
     fila.innerHTML =
         '<td>' +
             '<div class="celda-nombre">' + nombreMesa + '</div>' +
@@ -130,11 +145,76 @@ function crearFilaComanda(pedido) {
         '</td>' +
         '<td><span class="etiqueta-rol etiqueta-rol--mesero">' + (pedido.tipo_pedido || 'Mesa') + '</span></td>' +
         '<td class="mono">' + hora + '</td>' +
-        '<td><span class="etiqueta-estado etiqueta-rol--cocina">' + (pedido.estado_cocina || 'Pendiente') + '</span></td>' +
+        '<td>' + etiquetaEstado + '</td>' +
         '<td class="mono" style="font-weight:700;">S/ ' + parseFloat(pedido.total || 0).toFixed(2) + '</td>' +
         '<td class="celda-acciones">' +
-            '<a href="pedidoForm.html?mesa=' + (pedido.id_mesa || '') + '&pedido=' + pedido.id_pedido + '" class="boton boton--fantasma boton--pequeno">+ Agregar platos</a>' +
+            botonEstado +
+            '<a href="pedidoForm.html?mesa=' + (pedido.id_mesa || '') + '&pedido=' + pedido.id_pedido + '" class="boton boton--fantasma boton--pequeno">+ Platos</a>' +
+            '<button type="button" class="boton boton--advertencia boton--pequeno boton-cancelar-pedido" data-id="' + pedido.id_pedido + '" data-mesa="' + (pedido.numero_mesa || '') + '">✕ Cancelar</button>' +
         '</td>';
 
+    var btnListo = fila.querySelector('.boton-marcar-listo');
+    if (btnListo) {
+        btnListo.addEventListener('click', function(e) {
+            var id = e.currentTarget.getAttribute('data-id');
+            marcarComandaLista(id);
+        });
+    }
+
+    var btnCancelar = fila.querySelector('.boton-cancelar-pedido');
+    if (btnCancelar) {
+        btnCancelar.addEventListener('click', function(e) {
+            var id = e.currentTarget.getAttribute('data-id');
+            var mesa = e.currentTarget.getAttribute('data-mesa');
+            cancelarComanda(id, mesa);
+        });
+    }
+
     return fila;
+}
+
+async function marcarComandaLista(id_pedido) {
+    try {
+        await apiFetch('/pedidos/cambiar-estado', {
+            method: 'POST',
+            body: JSON.stringify({
+                id_pedido: parseInt(id_pedido),
+                nuevo_estado: 'Terminado'
+            })
+        });
+
+        // Recargar mesas y comandas activas
+        cargarComandasActivas();
+        cargarMesas();
+    } catch (error) {
+        alert('Error al marcar comanda como lista: ' + error.message);
+    }
+}
+
+async function cancelarComanda(id_pedido, numero_mesa) {
+    var mensajeConfirm = '¿Estás seguro de que deseas cancelar la comanda #' + id_pedido + '?';
+    if (numero_mesa) {
+        mensajeConfirm += '\nLa Mesa ' + numero_mesa + ' quedará liberada.';
+    }
+
+    var confirmado = window.confirm(mensajeConfirm);
+    if (!confirmado) {
+        return;
+    }
+
+    try {
+        await apiFetch('/pedidos/cambiar-estado', {
+            method: 'POST',
+            body: JSON.stringify({
+                id_pedido: parseInt(id_pedido),
+                nuevo_estado: 'Cancelado'
+            })
+        });
+
+        // Recargar mesas y comandas activas
+        cargarComandasActivas();
+        cargarMesas();
+    } catch (error) {
+        alert('Error al cancelar la comanda: ' + error.message);
+    }
 }

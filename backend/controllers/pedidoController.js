@@ -123,9 +123,52 @@ async function crearOActualizarPedido(req, res) {
     });
 }
 
+async function cambiarEstadoPedido(req, res) {
+    let body = '';
+    req.on('data', function (chunk) { body += chunk.toString(); });
+
+    req.on('end', async function () {
+        try {
+            const datos = JSON.parse(body);
+            const id_pedido = datos.id_pedido;
+            const nuevo_estado = datos.nuevo_estado;
+
+            if (!id_pedido || !nuevo_estado) {
+                res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+                return res.end(JSON.stringify({ mensaje: 'Se requiere id_pedido y nuevo_estado' }));
+            }
+
+            const pedidoActual = await pedidoModel.obtenerPorId(id_pedido);
+            if (!pedidoActual) {
+                res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
+                return res.end(JSON.stringify({ mensaje: 'Pedido no encontrado' }));
+            }
+
+            const pedidoActualizado = await pedidoModel.cambiarEstadoPedido(id_pedido, nuevo_estado);
+
+            // Si se cancela el pedido y tenia mesa asignada, liberar la mesa para nuevos clientes
+            if (nuevo_estado === 'Cancelado' && pedidoActual.id_mesa) {
+                await pedidoModel.liberarMesa(pedidoActual.id_mesa);
+            }
+
+            res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+            res.end(JSON.stringify({
+                mensaje: 'Estado del pedido actualizado a ' + nuevo_estado,
+                pedido: pedidoActualizado
+            }));
+
+        } catch (error) {
+            console.error('Error al cambiar estado del pedido:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+            res.end(JSON.stringify({ mensaje: 'Error al cambiar estado: ' + error.message }));
+        }
+    });
+}
+
 module.exports = {
     obtenerPendientes,
     obtenerUnPedido,
     obtenerPedidosActivos,
-    crearOActualizarPedido
+    crearOActualizarPedido,
+    cambiarEstadoPedido
 };

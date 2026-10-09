@@ -20,6 +20,12 @@ const rutas = {
     },
     'GET /comprobantes/turno-actual': async function(req, res) {
         await verificarToken(req, res, cajaController.obtenerComprobantesTurno);
+    },
+    'POST /caja/egreso': async function(req, res) {
+        await verificarToken(req, res, cajaController.registrarEgreso);
+    },
+    'GET /caja/movimientos': async function(req, res) {
+        await verificarToken(req, res, cajaController.obtenerMovimientos);
     }
 };
 

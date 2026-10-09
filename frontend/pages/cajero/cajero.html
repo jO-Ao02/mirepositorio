@@ -19,7 +19,8 @@
       <h1>Caja y Facturación</h1>
       <p>Control de turno, cobro de cuentas de mesas y emisión de comprobantes de pago.</p>
     </div>
-    <div style="display: flex; gap: 10px; align-items: center;">
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+      <button type="button" id="botonAbrirModalEgreso" class="boton boton--advertencia" style="width:auto;">- Registrar Egreso</button>
       <a href="cajaForm.html" id="botonControlTurno" class="boton boton--fantasma" style="width:auto;">Control de Turno</a>
     </div>
   </div>
@@ -43,13 +44,21 @@
         <div class="tarjeta-metrica__valor" id="valorTotalVendido">S/ 0.00</div>
       </div>
       <div class="tarjeta-metrica">
+        <div class="tarjeta-metrica__titulo">Total Egresos</div>
+        <div class="tarjeta-metrica__valor" id="valorTotalEgresos" style="color: var(--red);">- S/ 0.00</div>
+      </div>
+      <div class="tarjeta-metrica">
+        <div class="tarjeta-metrica__titulo">Efectivo en Caja</div>
+        <div class="tarjeta-metrica__valor" id="valorEfectivoEnCaja" style="color: var(--green);">S/ 0.00</div>
+      </div>
+      <div class="tarjeta-metrica">
         <div class="tarjeta-metrica__titulo">Cuentas Pendientes</div>
         <div class="tarjeta-metrica__valor" id="valorCuentasPendientes">0</div>
       </div>
     </div>
 
     <div id="avisoCajaCerrada" class="mensaje mensaje--error" hidden>
-      <strong>Atención:</strong> La caja está actualmente cerrada. Para procesar cobros y emitir comprobantes debes realizar la apertura de turno.
+      <strong>Atención:</strong> La caja está actualmente cerrada. Para procesar cobros y registrar egresos debes realizar la apertura de turno.
       <div style="margin-top: 10px;">
         <a href="cajaForm.html" class="boton boton--principal boton--pequeno" style="width:auto;">Abrir Turno de Caja Ahora</a>
       </div>
@@ -82,6 +91,30 @@
     <div id="mensajeSinPedidos" class="mensaje-vacio">No hay pedidos pendientes de cobro.</div>
   </div>
 
+  <!-- SECCIÓN DE MOVIMIENTOS Y EGRESOS DE CAJA -->
+  <div class="cabecera-seccion" style="margin-top: 40px;">
+    <div>
+      <h2 style="margin:0 0 4px; font-size:18px;">Movimientos y Egresos de Caja</h2>
+      <p>Registro de salidas de dinero (taxis, compras de emergencia, imprevistos) e ingresos del turno.</p>
+    </div>
+    <button type="button" id="botonRegistrarEgresoSec" class="boton boton--advertencia boton--pequeno">+ Nuevo Egreso</button>
+  </div>
+
+  <div class="tabla-envoltorio">
+    <table>
+      <thead>
+        <tr>
+          <th>Hora</th>
+          <th>Tipo</th>
+          <th>Descripción / Motivo</th>
+          <th style="text-align:right;">Monto</th>
+        </tr>
+      </thead>
+      <tbody id="cuerpoTablaMovimientos"></tbody>
+    </table>
+    <div id="mensajeSinMovimientos" class="mensaje-vacio">Aún no hay movimientos registrados en este turno.</div>
+  </div>
+
   <div class="cabecera-seccion" style="margin-top: 40px;">
     <div>
       <h2 style="margin:0 0 4px; font-size:18px;">Comprobantes emitidos en el turno</h2>
@@ -104,6 +137,36 @@
       <tbody id="cuerpoTablaComprobantes"></tbody>
     </table>
     <div id="mensajeSinComprobantes" class="mensaje-vacio">Aún no se han emitido comprobantes en este turno.</div>
+  </div>
+
+  <!-- MODAL PARA REGISTRAR EGRESO -->
+  <div id="modalEgreso" class="modal-envoltorio" hidden>
+    <div class="modal-contenido tarjeta">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h2 style="margin: 0; font-size: 18px;">Registrar Egreso de Caja</h2>
+        <button type="button" id="botonCerrarModalEgreso" class="boton boton--fantasma boton--pequeno" style="padding: 2px 8px; font-size: 14px;">✕</button>
+      </div>
+      <p class="tarjeta__descripcion">Registra una salida de dinero en efectivo por gastos menores o imprevistos.</p>
+
+      <div id="mensajeModalEgreso" class="mensaje" hidden></div>
+
+      <form id="formularioEgreso" novalidate>
+        <div class="campo">
+          <label for="campoMontoEgreso">Monto a retirar (S/)</label>
+          <input type="number" id="campoMontoEgreso" class="mono" step="0.50" min="0.10" placeholder="Ej. 15.00" required>
+        </div>
+
+        <div class="campo">
+          <label for="campoDescripcionEgreso">Motivo / Descripción del egreso</label>
+          <input type="text" id="campoDescripcionEgreso" placeholder="Ej. Taxi para compras, Hielo de emergencia, Insumos..." required>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+          <button type="button" id="botonCancelarModalEgreso" class="boton boton--fantasma">Cancelar</button>
+          <button type="submit" id="botonGuardarEgreso" class="boton boton--advertencia">Confirmar Egreso</button>
+        </div>
+      </form>
+    </div>
   </div>
 
 </main>

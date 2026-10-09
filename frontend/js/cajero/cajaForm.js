@@ -55,12 +55,17 @@ function mostrarModoCierre(estado) {
 
     var apertura = parseFloat(estado.monto_apertura || 0);
     var ventasEfectivo = parseFloat(estado.ventas_efectivo || 0);
+    var totalEgresos = parseFloat(estado.total_egresos || 0);
     var ventasDigitales = parseFloat(estado.ventas_digitales || 0);
     var totalVentas = ventasEfectivo + ventasDigitales;
-    efectivoEsperado = apertura + ventasEfectivo;
+    efectivoEsperado = parseFloat((apertura + ventasEfectivo - totalEgresos).toFixed(2));
 
     document.getElementById('cierreMontoApertura').textContent = 'S/ ' + apertura.toFixed(2);
     document.getElementById('cierreVentasEfectivo').textContent = 'S/ ' + ventasEfectivo.toFixed(2);
+    var elemEgresos = document.getElementById('cierreTotalEgresos');
+    if (elemEgresos) {
+        elemEgresos.textContent = '- S/ ' + totalEgresos.toFixed(2);
+    }
     document.getElementById('cierreVentasDigitales').textContent = 'S/ ' + ventasDigitales.toFixed(2);
     document.getElementById('cierreTotalVentas').textContent = 'S/ ' + totalVentas.toFixed(2);
     document.getElementById('cierreEfectivoEsperado').textContent = 'S/ ' + efectivoEsperado.toFixed(2);
