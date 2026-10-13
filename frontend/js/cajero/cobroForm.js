@@ -155,6 +155,7 @@ async function manejarEnvioCobro(evento) {
             body: JSON.stringify(datosCobro)
         });
 
+        marcarComandaLista(idPedidoActual)
         mostrarMensaje('¡Cobro registrado y comprobante emitido exitosamente!', 'exito');
 
         setTimeout(function() {
@@ -165,6 +166,21 @@ async function manejarEnvioCobro(evento) {
         mostrarMensaje('Error al procesar el cobro: ' + error.message, 'error');
         botonCobro.disabled = false;
         botonCobro.textContent = 'Confirmar Cobro y Emitir Comprobante';
+    }
+}
+
+async function marcarComandaLista(id_pedido) {//----------------------------------------------------------
+    try {
+        await apiFetch('/pedidos/cambiar-estado', {
+            method: 'POST',
+            body: JSON.stringify({
+                id_pedido: parseInt(id_pedido),
+                nuevo_estado: 'Pagado'
+            })
+        });
+
+    } catch (error) {
+        alert('Error al marcar comanda como Pagada: ' + error.message);
     }
 }
 

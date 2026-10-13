@@ -10,17 +10,16 @@ async function obtenerPendientesDeCobro() {
                 p.id_usuario,
                 CONCAT(u.nombre, ' ', u.apellido) AS nombre_mozo,
                 p.tipo_pedido,
-                COALESCE(p.estado_cocina, 'Pendiente') AS estado_entrega,
+                COALESCE(p.estado_pedido, 'Pendiente') AS estado_entrega,
                 p.total,
                 p.fecha_hora
             FROM pedido p
             LEFT JOIN mesa m ON p.id_mesa = m.id_mesa
             LEFT JOIN usuario u ON p.id_usuario = u.id_usuario
-            WHERE NOT EXISTS (
-                SELECT 1 FROM pago pg WHERE pg.id_pedido = p.id_pedido
-            )
-            AND COALESCE(p.estado_cocina, 'Pendiente') != 'Cancelado'
-            ORDER BY p.fecha_hora ASC
+            LEFT JOIN pago pg ON p.id_pedido = pg.id_pedido   
+            WHERE pg.id_pedido IS NULL                         
+            AND COALESCE(p.estado_pedido, 'Pendiente') != 'Cancelado'
+            ORDER BY p.fecha_hora DESC;
         `;
         const resultado = await pool.query(consulta);
         return resultado.rows;
@@ -40,7 +39,7 @@ async function obtenerPorId(id_pedido) {
                 p.id_usuario,
                 CONCAT(u.nombre, ' ', u.apellido) AS nombre_mozo,
                 p.tipo_pedido,
-                COALESCE(p.estado_cocina, 'Pendiente') AS estado_entrega,
+                COALESCE(p.estado_pedido, 'Pendiente') AS estado_entrega,
                 p.total,
                 p.fecha_hora
             FROM pedido p
@@ -82,7 +81,7 @@ async function obtenerDetallesPorPedido(id_pedido) {
 async function crearPedido(datos) {
     try {
         const consulta = `
-            INSERT INTO pedido (id_usuario, id_mesa, tipo_pedido, estado_cocina, total, fecha_hora)
+            INSERT INTO pedido (id_usuario, id_mesa, tipo_pedido, estado_pedido, total, fecha_hora)
             VALUES ($1, $2, $3, 'Pendiente', $4, NOW())
             RETURNING *
         `;
@@ -147,17 +146,16 @@ async function obtenerPedidosActivos() {
                 p.id_usuario,
                 CONCAT(u.nombre, ' ', u.apellido) AS nombre_mozo,
                 p.tipo_pedido,
-                COALESCE(p.estado_cocina, 'Pendiente') AS estado_cocina,
+                COALESCE(p.estado_pedido, 'Pendiente') AS estado_pedido,
                 p.total,
                 p.fecha_hora
             FROM pedido p
             LEFT JOIN mesa m ON p.id_mesa = m.id_mesa
             LEFT JOIN usuario u ON p.id_usuario = u.id_usuario
-            WHERE NOT EXISTS (
-                SELECT 1 FROM pago pg WHERE pg.id_pedido = p.id_pedido
-            )
-            AND COALESCE(p.estado_cocina, 'Pendiente') != 'Cancelado'
-            ORDER BY p.fecha_hora DESC
+            LEFT JOIN pago pg ON p.id_pedido = pg.id_pedido   
+            WHERE pg.id_pedido IS NULL                         
+            AND COALESCE(p.estado_pedido, 'Pendiente') != 'Cancelado'
+            ORDER BY p.fecha_hora DESC;
         `;
         const resultado = await pool.query(consulta);
         return resultado.rows;
@@ -169,7 +167,7 @@ async function obtenerPedidosActivos() {
 
 async function cambiarEstadoPedido(id_pedido, nuevo_estado) {
     try {
-        const consulta = 'UPDATE pedido SET estado_cocina = $1 WHERE id_pedido = $2 RETURNING *';
+        const consulta = 'UPDATE pedido SET estado_pedido = $1 WHERE id_pedido = $2 RETURNING *';
         const resultado = await pool.query(consulta, [nuevo_estado, id_pedido]);
         return resultado.rows[0];
     } catch (error) {

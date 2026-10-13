@@ -123,20 +123,14 @@ function crearFilaComanda(pedido) {
     var nombreMesa = pedido.numero_mesa ? 'Mesa ' + pedido.numero_mesa : 'Para llevar';
     var hora = pedido.fecha_hora ? new Date(pedido.fecha_hora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
 
-    var estadoCocina = pedido.estado_cocina || 'Pendiente';
-    var esTerminado = estadoCocina === 'Terminado' || estadoCocina === 'Listo';
+    var estadoPedido = pedido.estado_pedido || 'Pendiente';
 
-    var etiquetaEstado = '';
-    if (esTerminado) {
-        etiquetaEstado = '<span class="etiqueta-estado etiqueta-estado--activo">Listo para cobrar</span>';
-    } else {
-        etiquetaEstado = '<span class="etiqueta-estado etiqueta-rol--cocina">En preparación</span>';
-    }
+    var etiquetaEstado = '<span class="etiqueta-estado etiqueta-rol--cocina">En atención</span>';
 
-    var botonEstado = '';
-    if (!esTerminado) {
-        botonEstado = '<button type="button" class="boton boton--exito boton--pequeno boton-marcar-listo" data-id="' + pedido.id_pedido + '">✓ Marcar Listo</button>';
-    }
+    // var botonEstado = '';
+    // if (!esTerminado) {
+    //     botonEstado = '<button type="button" class="boton boton--exito boton--pequeno boton-marcar-listo" data-id="' + pedido.id_pedido + '">✓ Marcar Listo</button>';
+    // }
 
     fila.innerHTML =
         '<td>' +
@@ -148,18 +142,18 @@ function crearFilaComanda(pedido) {
         '<td>' + etiquetaEstado + '</td>' +
         '<td class="mono" style="font-weight:700;">S/ ' + parseFloat(pedido.total || 0).toFixed(2) + '</td>' +
         '<td class="celda-acciones">' +
-            botonEstado +
-            '<a href="pedidoForm.html?mesa=' + (pedido.id_mesa || '') + '&pedido=' + pedido.id_pedido + '" class="boton boton--fantasma boton--pequeno">+ Platos</a>' +
+            // botonEstado +
+            '<a href="pedidoForm.html?mesa=' + (pedido.id_mesa || '') + '&pedido=' + pedido.id_pedido + '" class="boton boton--fantasma boton--pequeno">Editar</a>' +
             '<button type="button" class="boton boton--advertencia boton--pequeno boton-cancelar-pedido" data-id="' + pedido.id_pedido + '" data-mesa="' + (pedido.numero_mesa || '') + '">✕ Cancelar</button>' +
         '</td>';
 
-    var btnListo = fila.querySelector('.boton-marcar-listo');
-    if (btnListo) {
-        btnListo.addEventListener('click', function(e) {
-            var id = e.currentTarget.getAttribute('data-id');
-            marcarComandaLista(id);
-        });
-    }
+    // var btnListo = fila.querySelector('.boton-marcar-listo');
+    // if (btnListo) {
+    //     btnListo.addEventListener('click', function(e) {
+    //         var id = e.currentTarget.getAttribute('data-id');
+    //         marcarComandaLista(id);
+    //     });
+    // }
 
     var btnCancelar = fila.querySelector('.boton-cancelar-pedido');
     if (btnCancelar) {
@@ -173,23 +167,23 @@ function crearFilaComanda(pedido) {
     return fila;
 }
 
-async function marcarComandaLista(id_pedido) {
-    try {
-        await apiFetch('/pedidos/cambiar-estado', {
-            method: 'POST',
-            body: JSON.stringify({
-                id_pedido: parseInt(id_pedido),
-                nuevo_estado: 'Terminado'
-            })
-        });
+// async function marcarComandaLista(id_pedido) {//----------------------------------------------------------
+//     try {
+//         await apiFetch('/pedidos/cambiar-estado', {
+//             method: 'POST',
+//             body: JSON.stringify({
+//                 id_pedido: parseInt(id_pedido),
+//                 nuevo_estado: 'Terminado'
+//             })
+//         });
 
-        // Recargar mesas y comandas activas
-        cargarComandasActivas();
-        cargarMesas();
-    } catch (error) {
-        alert('Error al marcar comanda como lista: ' + error.message);
-    }
-}
+//         // Recargar mesas y comandas activas
+//         cargarComandasActivas();
+//         cargarMesas();
+//     } catch (error) {
+//         alert('Error al marcar comanda como lista: ' + error.message);
+//     }
+// }
 
 async function cancelarComanda(id_pedido, numero_mesa) {
     var mensajeConfirm = '¿Estás seguro de que deseas cancelar la comanda #' + id_pedido + '?';
