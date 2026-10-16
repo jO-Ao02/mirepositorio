@@ -12,13 +12,20 @@ async function obtenerPendientesDeCobro() {
                 p.tipo_pedido,
                 COALESCE(p.estado_pedido, 'Pendiente') AS estado_entrega,
                 p.total,
-                p.fecha_hora
+                p.fecha_hora,
+                COALESCE((SELECT SUM(monto_pagado) FROM pago WHERE id_pedido = p.id_pedido), 0) AS total_pagado,
+                (p.total - COALESCE((SELECT SUM(monto_pagado) FROM pago WHERE id_pedido = p.id_pedido), 0)) AS saldo_pendiente,
+                (SELECT COUNT(*) FROM detalle_pedido WHERE id_pedido = p.id_pedido) AS total_items,
+                (SELECT COUNT(*) FROM detalle_pedido WHERE id_pedido = p.id_pedido AND id_comprobante IS NULL) AS items_pendientes
             FROM pedido p
             LEFT JOIN mesa m ON p.id_mesa = m.id_mesa
             LEFT JOIN usuario u ON p.id_usuario = u.id_usuario
-            LEFT JOIN pago pg ON p.id_pedido = pg.id_pedido   
-            WHERE pg.id_pedido IS NULL                         
-            AND COALESCE(p.estado_pedido, 'Pendiente') != 'Cancelado'
+            WHERE COALESCE(p.estado_pedido, 'Pendiente') NOT IN ('Pagado', 'Cancelado')
+              AND (
+                  EXISTS (SELECT 1 FROM detalle_pedido dp WHERE dp.id_pedido = p.id_pedido AND dp.id_comprobante IS NULL)
+                  OR (p.total - COALESCE((SELECT SUM(monto_pagado) FROM pago WHERE id_pedido = p.id_pedido), 0)) > 0.01
+                  OR NOT EXISTS (SELECT 1 FROM detalle_pedido dp WHERE dp.id_pedido = p.id_pedido)
+              )
             ORDER BY p.fecha_hora DESC;
         `;
         const resultado = await pool.query(consulta);
@@ -39,9 +46,14 @@ async function obtenerPorId(id_pedido) {
                 p.id_usuario,
                 CONCAT(u.nombre, ' ', u.apellido) AS nombre_mozo,
                 p.tipo_pedido,
+                COALESCE(p.estado_pedido, 'Pendiente') AS estado_pedido,
                 COALESCE(p.estado_pedido, 'Pendiente') AS estado_entrega,
                 p.total,
-                p.fecha_hora
+                p.fecha_hora,
+                COALESCE((SELECT SUM(monto_pagado) FROM pago WHERE id_pedido = p.id_pedido), 0) AS total_pagado,
+                (p.total - COALESCE((SELECT SUM(monto_pagado) FROM pago WHERE id_pedido = p.id_pedido), 0)) AS saldo_pendiente,
+                (SELECT COUNT(*) FROM detalle_pedido WHERE id_pedido = p.id_pedido AND id_comprobante IS NULL) AS items_pendientes,
+                (SELECT COUNT(*) FROM detalle_pedido WHERE id_pedido = p.id_pedido) AS total_items
             FROM pedido p
             LEFT JOIN mesa m ON p.id_mesa = m.id_mesa
             LEFT JOIN usuario u ON p.id_usuario = u.id_usuario
@@ -64,9 +76,17 @@ async function obtenerDetallesPorPedido(id_pedido) {
                 pr.nombre AS nombre_producto,
                 dp.cantidad,
                 dp.precio_unitario,
-                dp.subtotal
+                dp.subtotal,
+                dp.id_comprobante,
+                c.serie AS serie_comprobante,
+                c.correlativo AS correlativo_comprobante,
+                tc.descripcion AS tipo_comprobante_nombre,
+                cl.nombre_razon_social AS cliente_comprobante
             FROM detalle_pedido dp
             JOIN producto pr ON dp.id_producto = pr.id_producto
+            LEFT JOIN comprobante c ON dp.id_comprobante = c.id_comprobante
+            LEFT JOIN tipo_comprobante tc ON c.id_tipo_comprobante = tc.id_tipo_comprobante
+            LEFT JOIN cliente cl ON c.id_cliente = cl.id_cliente
             WHERE dp.id_pedido = $1
             ORDER BY dp.id_detalle ASC
         `;
@@ -148,13 +168,13 @@ async function obtenerPedidosActivos() {
                 p.tipo_pedido,
                 COALESCE(p.estado_pedido, 'Pendiente') AS estado_pedido,
                 p.total,
-                p.fecha_hora
+                p.fecha_hora,
+                COALESCE((SELECT SUM(monto_pagado) FROM pago WHERE id_pedido = p.id_pedido), 0) AS total_pagado,
+                (p.total - COALESCE((SELECT SUM(monto_pagado) FROM pago WHERE id_pedido = p.id_pedido), 0)) AS saldo_pendiente
             FROM pedido p
             LEFT JOIN mesa m ON p.id_mesa = m.id_mesa
             LEFT JOIN usuario u ON p.id_usuario = u.id_usuario
-            LEFT JOIN pago pg ON p.id_pedido = pg.id_pedido   
-            WHERE pg.id_pedido IS NULL                         
-            AND COALESCE(p.estado_pedido, 'Pendiente') != 'Cancelado'
+            WHERE COALESCE(p.estado_pedido, 'Pendiente') NOT IN ('Pagado', 'Cancelado')
             ORDER BY p.fecha_hora DESC;
         `;
         const resultado = await pool.query(consulta);

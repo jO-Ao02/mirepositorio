@@ -132,30 +132,49 @@ function crearFilaPedido(pedido) {
     var numeroMesa = pedido.numero_mesa ? 'Mesa ' + pedido.numero_mesa : 'Pedido #' + pedido.id_pedido;
     var horaFormateada = pedido.fecha_hora ? new Date(pedido.fecha_hora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-';
 
-    var estadoEntrega = pedido.estado_entrega || 'Pendiente';
-    var esTerminado = estadoEntrega === 'Terminado' || estadoEntrega === 'Listo';
+    var totalPedido = parseFloat(pedido.total || 0);
+    var totalPagado = parseFloat(pedido.total_pagado || 0);
+    var saldoPendiente = parseFloat((pedido.saldo_pendiente != null ? pedido.saldo_pendiente : (totalPedido - totalPagado)).toFixed(2));
+    var esParcial = totalPagado > 0.01;
 
     var etiquetaEstado = '';
     var botonCobro = '';
 
-    if (esTerminado) {
-        etiquetaEstado = '<span class="etiqueta-estado etiqueta-estado--activo">Listo para cobrar</span>';
-        botonCobro = '<a href="cobroForm.html?pedido=' + pedido.id_pedido + '" class="boton boton--principal boton--pequeno">Cobrar cuenta</a>';
+    if (esParcial) {
+        etiquetaEstado = '<span class="etiqueta-estado" style="background:#FFF7ED; color:#C2410C; border-color:#FED7AA;">Cobro parcial</span>';
+        botonCobro = '<a href="cobroForm.html?pedido=' + pedido.id_pedido + '" class="boton boton--principal boton--pequeno">Continuar cobro</a>';
     } else {
-        etiquetaEstado = '<span class="etiqueta-estado etiqueta-rol--cocina">En preparación</span>';
-        botonCobro = '<a href="cobroForm.html?pedido=' + pedido.id_pedido + '" class="boton boton--fantasma boton--pequeno">Cobrar</a>';
+        var estadoEntrega = pedido.estado_entrega || 'Pendiente';
+        var esTerminado = estadoEntrega === 'Terminado' || estadoEntrega === 'Listo';
+
+        if (esTerminado) {
+            etiquetaEstado = '<span class="etiqueta-estado etiqueta-estado--activo">Listo para cobrar</span>';
+            botonCobro = '<a href="cobroForm.html?pedido=' + pedido.id_pedido + '" class="boton boton--principal boton--pequeno">Cobrar cuenta</a>';
+        } else {
+            etiquetaEstado = '<span class="etiqueta-estado etiqueta-rol--cocina">En salón</span>';
+            botonCobro = '<a href="cobroForm.html?pedido=' + pedido.id_pedido + '" class="boton boton--fantasma boton--pequeno">Cobrar</a>';
+        }
+    }
+
+    var celdaMontoHtml = '';
+    if (esParcial) {
+        celdaMontoHtml = 
+            '<div class="mono" style="font-weight:700; color:var(--accent-dark);">S/ ' + saldoPendiente.toFixed(2) + '</div>' +
+            '<div class="celda-subtexto mono">de S/ ' + totalPedido.toFixed(2) + '</div>';
+    } else {
+        celdaMontoHtml = '<div class="mono" style="font-weight:700;">S/ ' + totalPedido.toFixed(2) + '</div>';
     }
 
     fila.innerHTML =
         '<td>' +
             '<div class="celda-nombre">' + numeroMesa + '</div>' +
-            '<div class="celda-subtexto mono">#' + pedido.id_pedido + '</div>' +
+            '<div class="celda-subtexto mono">#' + pedido.id_pedido + (esParcial ? ' &bull; ' + (pedido.items_pendientes || '?') + ' platos pend.' : '') + '</div>' +
         '</td>' +
         '<td><span class="etiqueta-rol etiqueta-rol--cocina">' + (pedido.tipo_pedido || 'Mesa') + '</span></td>' +
         '<td>' + (pedido.nombre_mozo || 'Personal') + '</td>' +
         '<td class="mono">' + horaFormateada + '</td>' +
         '<td>' + etiquetaEstado + '</td>' +
-        '<td class="mono" style="font-weight:700;">S/ ' + parseFloat(pedido.total || 0).toFixed(2) + '</td>' +
+        '<td>' + celdaMontoHtml + '</td>' +
         '<td class="celda-acciones">' +
             botonCobro +
         '</td>';

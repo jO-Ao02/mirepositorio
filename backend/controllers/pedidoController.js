@@ -1,5 +1,6 @@
 const pedidoModel = require('../models/pedidoModel');
 const mesaModel = require('../models/mesaModel');
+const cajaModel = require('../models/cajaModel');
 
 async function obtenerPendientes(req, res) {
     try {
@@ -29,6 +30,7 @@ async function obtenerUnPedido(req, res) {
 
         const detalles = await pedidoModel.obtenerDetallesPorPedido(id);
         pedido.detalles = detalles;
+        pedido.comprobantes = await cajaModel.obtenerComprobantesPorPedido(id);
 
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify(pedido));

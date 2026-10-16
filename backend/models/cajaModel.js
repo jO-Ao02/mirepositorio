@@ -99,18 +99,74 @@ async function registrarMovimiento(id_caja, tipo_movimiento, monto, descripcion)
     }
 }
 
-async function registrarPago(id_pedido, id_caja, id_movimiento, metodo_pago, monto_pagado) {
+async function registrarPago(id_pedido, id_caja, id_movimiento, metodo_pago, monto_pagado, id_comprobante) {
     try {
         const consulta = `
-            INSERT INTO pago (id_pedido, id_caja, id_movimiento, metodo_pago, monto_pagado, estado_pago, fecha_pago)
-            VALUES ($1, $2, $3, $4, $5, 'pagado', NOW())
+            INSERT INTO pago (id_pedido, id_caja, id_movimiento, metodo_pago, monto_pagado, estado_pago, fecha_pago, id_comprobante)
+            VALUES ($1, $2, $3, $4, $5, 'pagado', NOW(), $6)
             RETURNING *
         `;
-        const valores = [id_pedido, id_caja, id_movimiento, metodo_pago, monto_pagado];
+        const valores = [id_pedido, id_caja, id_movimiento, metodo_pago, monto_pagado, id_comprobante || null];
         const resultado = await pool.query(consulta, valores);
         return resultado.rows[0];
     } catch (error) {
         console.error('Error al registrar pago:', error.message);
+        throw error;
+    }
+}
+
+async function asociarDetallesAComprobante(id_pedido, id_comprobante, items) {
+    try {
+        if (!items || items.length === 0) {
+            // Si no se especificaron items, asociar todos los que aún no tengan comprobante
+            await pool.query(
+                'UPDATE detalle_pedido SET id_comprobante = $1 WHERE id_pedido = $2 AND id_comprobante IS NULL',
+                [id_comprobante, id_pedido]
+            );
+            return;
+        }
+
+        for (const item of items) {
+            const id_detalle = parseInt(item.id_detalle);
+            const cantDeseada = parseInt(item.cantidad);
+
+            const resActual = await pool.query(
+                'SELECT * FROM detalle_pedido WHERE id_detalle = $1 AND id_pedido = $2',
+                [id_detalle, id_pedido]
+            );
+
+            if (resActual.rows.length === 0) continue;
+            const detalleActual = resActual.rows[0];
+
+            if (cantDeseada >= detalleActual.cantidad) {
+                // Se cobra la cantidad completa de la fila
+                await pool.query(
+                    'UPDATE detalle_pedido SET id_comprobante = $1 WHERE id_detalle = $2',
+                    [id_comprobante, id_detalle]
+                );
+            } else if (cantDeseada > 0 && cantDeseada < detalleActual.cantidad) {
+                // División fraccionada de un ítem (ej. 1 de 2 platos)
+                const cantRestante = detalleActual.cantidad - cantDeseada;
+                const precioUnitario = parseFloat(detalleActual.precio_unitario);
+                const subtotalCobrado = parseFloat((cantDeseada * precioUnitario).toFixed(2));
+                const subtotalRestante = parseFloat((cantRestante * precioUnitario).toFixed(2));
+
+                // La fila actual pasa a ser la cobrada
+                await pool.query(
+                    'UPDATE detalle_pedido SET cantidad = $1, subtotal = $2, id_comprobante = $3 WHERE id_detalle = $4',
+                    [cantDeseada, subtotalCobrado, id_comprobante, id_detalle]
+                );
+
+                // La cantidad restante se mantiene en una nueva fila sin comprobante
+                await pool.query(
+                    `INSERT INTO detalle_pedido (id_pedido, id_producto, cantidad, precio_unitario, subtotal, id_comprobante)
+                     VALUES ($1, $2, $3, $4, $5, NULL)`,
+                    [id_pedido, detalleActual.id_producto, cantRestante, precioUnitario, subtotalRestante]
+                );
+            }
+        }
+    } catch (error) {
+        console.error('Error al asociar detalles a comprobante:', error.message);
         throw error;
     }
 }
@@ -219,7 +275,7 @@ async function obtenerComprobantesPorCaja(id_caja) {
             FROM comprobante c
             JOIN cliente cl ON c.id_cliente = cl.id_cliente
             JOIN tipo_comprobante tc ON c.id_tipo_comprobante = tc.id_tipo_comprobante
-            JOIN pago pg ON c.id_pedido = pg.id_pedido
+            LEFT JOIN pago pg ON (c.id_comprobante = pg.id_comprobante OR (pg.id_comprobante IS NULL AND c.id_pedido = pg.id_pedido))
             LEFT JOIN pedido p ON c.id_pedido = p.id_pedido
             LEFT JOIN mesa m ON p.id_mesa = m.id_mesa
             WHERE pg.id_caja = $1
@@ -230,6 +286,34 @@ async function obtenerComprobantesPorCaja(id_caja) {
     } catch (error) {
         console.error('Error al obtener comprobantes por caja:', error.message);
         throw error;
+    }
+}
+
+async function obtenerComprobantesPorPedido(id_pedido) {
+    try {
+        const consulta = `
+            SELECT 
+                c.id_comprobante,
+                c.serie,
+                c.correlativo,
+                tc.descripcion AS tipo_comprobante,
+                cl.nombre_razon_social AS nombre_cliente,
+                cl.numero_documento,
+                c.total,
+                c.fecha_emision,
+                pg.metodo_pago
+            FROM comprobante c
+            JOIN cliente cl ON c.id_cliente = cl.id_cliente
+            JOIN tipo_comprobante tc ON c.id_tipo_comprobante = tc.id_tipo_comprobante
+            LEFT JOIN pago pg ON (c.id_comprobante = pg.id_comprobante OR (pg.id_comprobante IS NULL AND c.id_pedido = pg.id_pedido))
+            WHERE c.id_pedido = $1
+            ORDER BY c.id_comprobante ASC
+        `;
+        const resultado = await pool.query(consulta, [id_pedido]);
+        return resultado.rows;
+    } catch (error) {
+        console.error('Error al obtener comprobantes por pedido:', error.message);
+        return [];
     }
 }
 
@@ -299,6 +383,8 @@ module.exports = {
     obtenerSiguienteCorrelativo,
     insertarComprobante,
     obtenerComprobantesPorCaja,
+    obtenerComprobantesPorPedido,
+    asociarDetallesAComprobante,
     registrarEgreso,
     obtenerEgresosPorCaja,
     obtenerMovimientosPorCaja

@@ -821,6 +821,153 @@ tbody tr:hover {
   border: 1px solid var(--red);
 }
 
+/* ===================== DIVISION DE CUENTA Y COBROS ===================== */
+
+.resumen-cuenta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 600px) {
+  .resumen-cuenta-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.caja-resumen-monto {
+  background: var(--surface-sunk);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+
+.caja-resumen-monto--saldo {
+  background: #FFF7ED;
+  border-color: #FED7AA;
+}
+
+.caja-resumen-monto--pagado {
+  background: var(--green-tint);
+  border-color: #C4D9CB;
+}
+
+.caja-resumen-monto__etiqueta {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+
+.caja-resumen-monto__valor {
+  font-size: 18px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--ink);
+}
+
+.fila-item-pagado {
+  background: #FAF7F2;
+  opacity: 0.65;
+}
+
+.fila-item-pagado td {
+  color: var(--muted);
+}
+
+.badge-item-pagado {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: #2C4B37;
+  background: var(--green-tint);
+  border: 1px solid #C4D9CB;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.badge-item-pendiente {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent-dark);
+  background: var(--accent-tint);
+  border: 1px solid #E9CDA3;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.selector-modo-cobro {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  background: var(--surface-sunk);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+}
+
+.boton-modo {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.boton-modo--activo {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.input-cantidad-item {
+  width: 55px;
+  padding: 4px 6px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 13px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  text-align: center;
+}
+
+.input-checkbox-item {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
+.card-comprobante-previo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
